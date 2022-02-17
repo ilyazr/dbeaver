@@ -41,6 +41,7 @@ public class DataExporterHTML extends StreamExporterAbstract {
 
     private static final String PROP_HEADER = "tableHeader";
     private static final String PROP_COLUMN_HEADERS = "columnHeaders";
+    private static final String PROP_BACKGROUND_COLOR = "backgroundColor";
 
     private String name;
     private static final int IMAGE_FRAME_SIZE = 200;
@@ -50,6 +51,22 @@ public class DataExporterHTML extends StreamExporterAbstract {
 
     private boolean outputHeader = true;
     private boolean outputColumnHeaders = true;
+    
+    private enum BackgroundColor {
+    	blue("#D0E3FA", "#6495ed"),
+    	red("#DE5151", "#EC9D9D"), 
+    	green("#91C95E", "#C2E1A5"); 
+    	
+    	String mainColor;
+    	String secondaryColor;
+    	
+    	BackgroundColor(String mainColor, String secondaryColor) {
+    		this.mainColor = mainColor;
+    		this.secondaryColor = secondaryColor;
+    	}
+    }
+    
+    private BackgroundColor backgroundColor = BackgroundColor.blue;
 
     @Override
     public void init(IStreamDataExporterSite site) throws DBException {
@@ -58,6 +75,8 @@ public class DataExporterHTML extends StreamExporterAbstract {
         Map<String, Object> properties = site.getProperties();
         outputHeader = CommonUtils.getBoolean(properties.get(PROP_HEADER), outputHeader);
         outputColumnHeaders = CommonUtils.getBoolean(properties.get(PROP_COLUMN_HEADERS), outputColumnHeaders);
+        
+        backgroundColor = BackgroundColor.valueOf((String) properties.get(PROP_BACKGROUND_COLOR));
     }
 
     @Override
@@ -85,13 +104,13 @@ public class DataExporterHTML extends StreamExporterAbstract {
             "border: thin solid #6495ed;" +
 //              "width: 50%;" +
             "padding: 5px;" +
-            "background-color: #D0E3FA;}" +
+			"background-color: " + backgroundColor.mainColor + ";}" +
             "td{font-family: sans-serif;" +
             "border: thin solid #6495ed;" +
 //              "width: 50%;" +
             "padding: 5px;" +
             "text-align: center;}" +
-            ".odd{background:#e8edff;}" +
+			".odd{background: " + backgroundColor.secondaryColor + ";}" +
             "img{padding:5px; border:solid; border-color: #dddddd #aaaaaa #aaaaaa #dddddd; border-width: 1px 2px 2px 1px; background-color:white;}" +
             "</style>\n</head>\n");
         out.write("<body>\n<table>");
